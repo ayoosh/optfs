@@ -3,6 +3,7 @@ modprobe -r ext4bf
 #cd ..
 make
 make modules_install
+cp ./ext4bf.ko /lib/modules/3.2.0vijaycbf-gbde0b1a-dirty/.
 echo "Loading module"
 modprobe ext4bf
 echo "Mounting fs"
