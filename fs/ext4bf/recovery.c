@@ -23,6 +23,20 @@
 #include <linux/crc32.h>
 #endif
 
+extern __u32 dzat_checksum(char *p, unsigned int size) {
+
+    int i;
+    int flag = 0;
+    for (i = 0; (i < size) && (flag == 0); i++) {
+        if (*(p + i) != 0) {
+            flag = 1;
+        }
+    }
+
+    return flag;
+}
+
+
 /*
  * Maintain information about the progress of the recovery job, so that
  * the different passes can carry information between them.
@@ -350,8 +364,12 @@ static int read_and_verify_checksums(journal_t *journal, struct buffer_head *bh,
                 return 1;
             } else {
                 crc32_sum = 0;
+#if DZAT
+                crc32_sum = dzat_checksum((void *)obh->b_data, obh->b_size);
+#else
                 crc32_sum = crc32_be(0, (void *)obh->b_data,
                         obh->b_size);
+#endif
                 jbd_debug(6, "EXT4BF: calc checksum from block: %u\n", crc32_sum);
                 char *cdata = (char*)obh->b_data;
                 jbd_debug(6, "EXT4BF: printing the first four characters from the read block: %c%c%c%c\n",
@@ -502,8 +520,11 @@ static int calc_chksums(journal_t *journal, struct buffer_head *bh,
 
 	num_blks = count_tags(journal, bh);
 	/* Calculate checksum of the descriptor block. */
-	*crc32_sum = crc32_be(*crc32_sum, (void *)bh->b_data, bh->b_size);
-
+#if DZAT
+    *crc32_sum = dzat_checksum((void *)bh->b_data, bh->b_size);
+#else
+    *crc32_sum = crc32_be(*crc32_sum, (void *)bh->b_data, bh->b_size);
+#endif
 	for (i = 0; i < num_blks; i++) {
 		io_block = (*next_log_block)++;
 		wrap(journal, *next_log_block);
@@ -513,8 +534,12 @@ static int calc_chksums(journal_t *journal, struct buffer_head *bh,
 				"%lu in log\n", err, io_block);
 			return 1;
 		} else {
+#if DZAT
+            *crc32_sum = dzat_checksum((void *)obh->b_data, obh->b_size);
+#else
 			*crc32_sum = crc32_be(*crc32_sum, (void *)obh->b_data,
 				     obh->b_size);
+#endif
 		}
 		put_bh(obh);
 	}

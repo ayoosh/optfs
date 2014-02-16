@@ -34,6 +34,15 @@
 #include <linux/slab.h>
 #endif
 
+#include <linux/crc32.h>
+#define DZAT        1
+extern __u32 dzat_checksum(char *, unsigned int);
+
+
+
+
+
+
 #define journal_oom_retry 1
 
 /*
