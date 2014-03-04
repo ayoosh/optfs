@@ -27,12 +27,12 @@ extern __u32 dzat_checksum(char *p, unsigned int size) {
 
     int i;
     int flag = 0;
-    for (i = 0; (i < size) && (flag == 0); i++) {
-        if (*(p + i) != 0) {
+    int *pint = (int *)p;
+    for (i = 0; (i < size/sizeof(int)) && (flag == 0); i++) {
+        if (*(pint + i) != 0) {
             flag = 1;
         }
     }
-
     return flag;
 }
 
