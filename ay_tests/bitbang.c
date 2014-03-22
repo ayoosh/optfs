@@ -1,5 +1,7 @@
 /* This program is distributed under the GPL, version 2 */
 
+#define LOCAL_NSEC ((unsigned long long) ((end.tv_usec - start.tv_usec) + ((end.tv_sec - start.tv_sec) * USEC_PER_SEC)))
+#define USEC_PER_SEC 1000000
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -11,6 +13,7 @@ int main(int argc, char **argv)
     int f,i;
     unsigned char buf[1];
     int retval = 0;
+	struct timeval start, end;
 
     if ((ftdi = ftdi_new()) == 0)
     {
