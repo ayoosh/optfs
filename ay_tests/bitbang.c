@@ -1,11 +1,13 @@
 /* This program is distributed under the GPL, version 2 */
 
-#define LOCAL_NSEC ((unsigned long long) ((end.tv_usec - start.tv_usec) + ((end.tv_sec - start.tv_sec) * USEC_PER_SEC)))
+#define LOCAL_NSEC ((unsigned long long) ((end.tv_nsec - start.tv_nsec) + ((end.tv_sec - start.tv_sec) * NSEC_PER_SEC)))
 #define USEC_PER_SEC 1000000
+#define NSEC_PER_SEC 1000000000
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <libftdi1/ftdi.h>
+#include <time.h>
 
 int main(int argc, char **argv)
 {
@@ -13,7 +15,7 @@ int main(int argc, char **argv)
     int f,i;
     unsigned char buf[1];
     int retval = 0;
-	struct timeval start, end;
+	struct timespec start, end;
 
     if ((ftdi = ftdi_new()) == 0)
     {
@@ -37,7 +39,7 @@ int main(int argc, char **argv)
 
     usleep(3 * 1000000);
 
-    buf[0] = 0x0;
+    buf[0] = 0xFF;
     printf("turning everything on\n");
     f = ftdi_write_data(ftdi, buf, 1);
     if (f < 0) {
@@ -47,13 +49,16 @@ int main(int argc, char **argv)
 //    usleep(3 * 1000000); 
     getchar();
 
-    buf[0] = 0xFF;
+    buf[0] = 0x0;
     printf("turning everything off\n");
+    clock_gettime(CLOCK_MONOTONIC, &start);
     f = ftdi_write_data(ftdi, buf, 1);
     if (f < 0)
     {
         printf(stderr,"write failed for 0x%x, error %d (%s)\n",buf[0],f, ftdi_get_error_string(ftdi));
     }
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("\n%15llu\n", LOCAL_NSEC);
 /*
     usleep(3 * 1000000);
 
