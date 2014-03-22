@@ -1,0 +1,23 @@
+Read = 1, Write = 0, Seq = 0, Random = 1, File Range = 21474836480
+Block =          1 ,Ops =     100000 ,Time Taken(ns)=      6073132941 ,Throughput IOPS =      16465
+Block =          2 ,Ops =     100000 ,Time Taken(ns)=      6107682111 ,Throughput IOPS =      16372
+Block =          4 ,Ops =     100000 ,Time Taken(ns)=      6031212641 ,Throughput IOPS =      16580
+Block =          8 ,Ops =     100000 ,Time Taken(ns)=      6063329101 ,Throughput IOPS =      16492
+Block =         16 ,Ops =     100000 ,Time Taken(ns)=      5729133080 ,Throughput IOPS =      17454
+Block =         32 ,Ops =     100000 ,Time Taken(ns)=      5142177870 ,Throughput IOPS =      19447
+Block =         64 ,Ops =     100000 ,Time Taken(ns)=      4169820991 ,Throughput IOPS =      23981
+Block =        128 ,Ops =     100000 ,Time Taken(ns)=      2910305286 ,Throughput IOPS =      34360
+Block =        256 ,Ops =     100000 ,Time Taken(ns)=      1801868715 ,Throughput IOPS =      55497
+Block =        512 ,Ops =     100000 ,Time Taken(ns)=      1157268276 ,Throughput IOPS =      86410
+Block =       1024 ,Ops =     100000 ,Time Taken(ns)=       827975579 ,Throughput IOPS =     120776
+Block =       2048 ,Ops =     100000 ,Time Taken(ns)=       667350596 ,Throughput IOPS =     149846
+Block =       4096 ,Ops =     100000 ,Time Taken(ns)=       468750656 ,Throughput IOPS =     213333
+Block =       8192 ,Ops =     100000 ,Time Taken(ns)=       463604011 ,Throughput IOPS =     215701
+Block =      16384 ,Ops =     100000 ,Time Taken(ns)=       585521517 ,Throughput IOPS =     170787
+Block =      32768 ,Ops =     100000 ,Time Taken(ns)=      1056248129 ,Throughput IOPS =      94674
+Block =      65536 ,Ops =     100000 ,Time Taken(ns)=      1817064490 ,Throughput IOPS =      55033
+Block =     131072 ,Ops =     100000 ,Time Taken(ns)=      3842177006 ,Throughput IOPS =      26026
+Block =     262144 ,Ops =     100000 ,Time Taken(ns)=      7608660772 ,Throughput IOPS =      13142
+Block =     524288 ,Ops =     100000 ,Time Taken(ns)=     14015451277 ,Throughput IOPS =       7134
+Block =    1048576 ,Ops =     100000 ,Time Taken(ns)=     35045291801 ,Throughput IOPS =       2853
+Block =    2097152 ,Ops =     100000 ,Time Taken(ns)=    109178507516 ,Throughput IOPS =        915
