@@ -5,6 +5,13 @@
 #define OUT_FILE "./result.txt"
 #define LOCAL_NSEC ((unsigned long) ((end.tv_nsec - ref.tv_nsec) + ((end.tv_sec - ref.tv_sec) * NSEC_PER_SEC)))
 
+#define SSD_ON  if (ftdi_write_data(ftdi, 0xFF, 1) < 0) \
+                {printf("SSD ON failed, error %s\n", ftdi_get_error_string(ftdi));}
+
+#define SSD_OFF if (ftdi_write_data(ftdi, 0x0, 1) < 0) \
+                {printf("SSD ON failed, error %s\n", ftdi_get_error_string(ftdi));}
+
+
 #include <stdio.h>          // printf
 #include <stdlib.h>         // malloc
 #include <sys/types.h>      // block IO
@@ -14,27 +21,28 @@
 #include <libftdi1/ftdi.h>	// FTDI
 #include <dirent.h>			// Directory
 #include <string.h>			// String Ops
+#include <signal.h>         // Kill command
 
 struct record {
 	unsigned int num;
 	unsigned long time;
 } rec [262144];
 
-unsigned long get_data_acked (char *) {
+//unsigned long get_data_acked (char *) {
 
-void dev_name_update(char *);
-int is_sdc(struct direct *);
-int is_sdd(struct direct *);
-int is_sde(struct direct *);
+//void dev_name_update(char *);
+//int is_sdc(struct direct *);
+//int is_sdd(struct direct *);
+//int is_sde(struct direct *);
 
 // FTDI
-struct ftdi_context* ftdi_setup (void);
-void ftdi_cleanup (struct ftdi_context*);
+//struct ftdi_context *ftdi_setup (void);
+//void ftdi_cleanup (struct ftdi_context *ftdi);
 
 int main (int argc, char *argv[])
 {
     unsigned int    device, i, j, seek, sprintf_size, last_blk, flag, rand_flag = 1;
-    unsigned int    outfile, tracefile, *addr, block_size, rec_acked, rec_pers; 
+    unsigned int    outfile, tracefile, block_size, rec_acked, rec_pers, block_num; 
     char            *buf, *buf_test, c, d, buf2[1000], device_path[20], devname[20];
     struct timespec	ref, end;
 	struct			ftdi_context *ftdi;
@@ -44,7 +52,7 @@ int main (int argc, char *argv[])
 
 	// Setup start
     srand(time(NULL));
-	ftdi = ftdi_setup();
+	ftdi = relay_setup(void);
 	SSD_ON;
 	c = 97;
     for (i = 0; i < 1000; i++) {
@@ -62,7 +70,7 @@ int main (int argc, char *argv[])
     system(buf2);
 
 	unlink(OUT_FILE);
-    if (((outfile= open(OUT_FILE, O_RDWR | O_CREAT, O_SYNC)) == -1) {
+    if ((outfile = open(OUT_FILE, O_RDWR | O_CREAT, O_SYNC)) == -1) {
         printf("Could not open an output file, exiting\n");
         exit(1);
     }
@@ -184,16 +192,17 @@ int main (int argc, char *argv[])
 		}
 		rand_flag = 0;
 	}
-	// Cleanup Phase
+	
+    // Cleanup Phase
 	printf("normal exit\n");
-	ftdi_cleanup (ftdi);
+	relay_cleanup (ftdi);
     close(device);
-    close(outfile_i);
-    close(outfile_p);
+    close(outfile);
     return;
 }
 
 unsigned long get_data_acked (char *fname) {
+
 	FILE *fp;
 	char str[1024];
 	char *index;
@@ -223,7 +232,7 @@ unsigned long get_data_acked (char *fname) {
 
 
 int is_sdc(struct direct *entry) {
-	if ((strcmp(entry->d_name, "sdc")== 0) {
+	if (strcmp(entry->d_name, "sdc")== 0) {
 		return (1); // True
 	} else {
 		return (0); // False
@@ -231,7 +240,7 @@ int is_sdc(struct direct *entry) {
 }
 
 int is_sdd(struct direct *entry) {
-	if ((strcmp(entry->d_name, "sdd")== 0) {
+	if (strcmp(entry->d_name, "sdd")== 0) {
 		return (1); // True
 	} else {
 		return (0); // False
@@ -239,7 +248,7 @@ int is_sdd(struct direct *entry) {
 }
 
 int is_sde(struct direct *entry) {
-	if ((strcmp(entry->d_name, "sde")== 0) {
+	if (strcmp(entry->d_name, "sde")== 0) {
 		return (1); // True
 	} else {
 		return (0); // False
@@ -276,13 +285,8 @@ void dev_name_update(char *name) {
 }
 
 // FTDI Functions and Macros
-#define SSD_ON 	if (ftdi_write_data(ftdi, 0xFF, 1) < 0) \
-					{printf("SSD ON failed, error %s\n", ftdi_get_error_string(ftdi));}
 
-#define SSD_OFF	if (ftdi_write_data(ftdi, 0x0, 1) < 0) \
-					{printf("SSD ON failed, error %s\n", ftdi_get_error_string(ftdi));}
-
-struct ftdi_context* ftdi_setup (void) {
+void* relay_setup (void) {
 	struct ftdi_context *ftdi;
 	int f;
 	
@@ -300,13 +304,15 @@ struct ftdi_context* ftdi_setup (void) {
     }
 
     printf("ftdi open succeeded: %d\n",f);
-
     printf("enabling bitbang mode\n");
     ftdi_set_bitmode(ftdi, 0xFF, BITMODE_BITBANG);
+    
+    return (ftdi);
 }
 
-void ftdi_cleanup (ftdi_context* ftdi) {
+void relay_cleanup (struct ftdi_context *ftdi) {
 	ftdi_disable_bitbang(ftdi);
     ftdi_usb_close(ftdi);
     ftdi_free(ftdi);
 }
+
