@@ -41,10 +41,13 @@ int main(int argc, char **argv)
 
     buf[0] = 0xFF;
     printf("turning everything on\n");
+    clock_gettime(CLOCK_MONOTONIC, &start);
     f = ftdi_write_data(ftdi, buf, 1);
+    clock_gettime(CLOCK_MONOTONIC, &end);
     if (f < 0) {
         printf(stderr,"write failed for 0x%x, error %d (%s)\n",buf[0],f, ftdi_get_error_string(ftdi));
     }
+    printf("\n%15llu\n", LOCAL_NSEC);
 
 //    usleep(3 * 1000000); 
     getchar();
@@ -53,11 +56,11 @@ int main(int argc, char **argv)
     printf("turning everything off\n");
     clock_gettime(CLOCK_MONOTONIC, &start);
     f = ftdi_write_data(ftdi, buf, 1);
+    clock_gettime(CLOCK_MONOTONIC, &end);
     if (f < 0)
     {
         printf(stderr,"write failed for 0x%x, error %d (%s)\n",buf[0],f, ftdi_get_error_string(ftdi));
     }
-    clock_gettime(CLOCK_MONOTONIC, &end);
     printf("\n%15llu\n", LOCAL_NSEC);
 /*
     usleep(3 * 1000000);
